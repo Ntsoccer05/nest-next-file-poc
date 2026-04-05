@@ -3,21 +3,14 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    paths:
+      - "backend/**/*.ts"
+      - "frontend/**/*.tsx"
+      - "frontend/**/*.ts"
+      - ".github/workflows/**"
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,7 +31,42 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          model: 'claude-opus-4-6'
+          prompt: |
+            このプロジェクトのベストプラクティスに基づいてコードレビューを実施してください。
 
+            【プロジェクト概要】
+            - NestJS バックエンド（port 3001）
+            - Next.js v15 フロントエンド（port 3000）
+            - ファイル検証：multer + file-type + exiftool-vendored
+            - EXIFメタデータ取得と悪意ファイルのブロック
+
+            【レビュー観点】
+
+            **Backend（NestJS）**
+            - exiftool-vendored の生存期間管理（onModuleDestroy で必ず end()）
+            - 一時ファイルの cleanup（finally で必ず削除）
+            - 複数段階のセキュリティチェック（拡張子 → MIME → マジックバイト）
+            - エラーメッセージは日本語
+            - Pipe・Service の責任分離が明確か
+
+            **Frontend（Next.js）**
+            - SSR/CSR hydration mismatch の回避（useIsClient フック使用等）
+            - 日本語UI（JST/UTC 両方表示）
+            - エラー時の適切なユーザーフィードバック
+            - ファイルサイズ表示の Locale 対応
+
+            **共通**
+            - EXIF メタデータの正確な取得ロジック
+            - メモリリーク（tempFile 削除、ExifTool 終了）
+            - null safety（createdAt が null の場合の扱い）
+            - JSON シリアライズ可能性（Buffer 除外等）
+
+            **コミット・PR品質**
+            - commit message が明確か（何をした・なぜか）
+            - breaking change の有無を確認
+            - 不要な依存追加・アップデートがないか
+
+            問題があれば、改善案をコード例付きで提示してください。
+            PoC品質の制限（テストなし等）は許容します。
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
