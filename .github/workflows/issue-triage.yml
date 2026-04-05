@@ -1,0 +1,45 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage-issue:
+    # Issue が開かれたとき、Claude がラベル分類を自動実行
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Issue Triage with Haiku
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
+          plugins: 'issue-triage@claude-code-plugins'
+          model: 'claude-haiku-4-5-20251001'
+          prompt: |
+            このリポジトリの Issue を分類してください。
+
+            【Issue情報】
+            Repository: ${{ github.repository }}
+            Issue Number: ${{ github.event.issue.number }}
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+            【ラベル付与ルール】
+            - bug: バグ・エラー報告
+            - feature: 新機能リクエスト
+            - enhancement: 既存機能の改善
+            - documentation: ドキュメント関連
+            - question: 質問・サポート依頼
+
+            適切なラベルを付与してください。複数選択可。
