@@ -7,6 +7,7 @@ on:
       - "backend/**/*.ts"
       - "frontend/**/*.tsx"
       - "frontend/**/*.ts"
+      - "github/workflows/*.yml"
 
 jobs:
   claude-review:
