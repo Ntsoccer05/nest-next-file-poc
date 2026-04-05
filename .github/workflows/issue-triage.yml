@@ -18,6 +18,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Setup Claude commands
+        run: |
+          mkdir -p ~/.claude/commands
+          cp -r .claude/commands/* ~/.claude/commands/
+          ls -la ~/.claude/commands/
+
       - name: Run Claude Issue Triage
         uses: anthropics/claude-code-action@v1
         with:
