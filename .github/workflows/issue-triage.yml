@@ -30,7 +30,7 @@ jobs:
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'issue-triage@claude-code-plugins'
           prompt: |
-            CLAUDE.md の "Issue Triage Prompt" セクションに従って Issue を分類してください。
+            claude-haiku-4-5-20251001 を使用して、CLAUDE.md の "Issue Triage Prompt" セクションに従って Issue を分類してください。
 
             【Issue情報】
             Repository: ${{ github.repository }}
