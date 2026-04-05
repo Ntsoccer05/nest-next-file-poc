@@ -27,19 +27,10 @@ jobs:
           plugins: 'issue-triage@claude-code-plugins'
           model: 'claude-haiku-4-5-20251001'
           prompt: |
-            このリポジトリの Issue を分類してください。
+            CLAUDE.md の "Issue Triage Prompt" セクションに従って Issue を分類してください。
 
             【Issue情報】
             Repository: ${{ github.repository }}
             Issue Number: ${{ github.event.issue.number }}
             Title: ${{ github.event.issue.title }}
             Body: ${{ github.event.issue.body }}
-
-            【ラベル付与ルール】
-            - bug: バグ・エラー報告
-            - feature: 新機能リクエスト
-            - enhancement: 既存機能の改善
-            - documentation: ドキュメント関連
-            - question: 質問・サポート依頼
-
-            適切なラベルを付与してください。複数選択可。
