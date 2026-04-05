@@ -6,7 +6,6 @@ on:
 
 jobs:
   triage-issue:
-    # Issue が開かれたとき、Claude がラベル分類を自動実行
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -20,7 +19,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude Issue Triage with Haiku
+      - name: Run Claude Issue Triage
         uses: anthropics/claude-code-action@v1
         env:
           ISSUE_TITLE: ${{ github.event.issue.title }}
@@ -28,13 +27,14 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'issue-triage@claude-code-plugins'
           model: 'claude-haiku-4-5-20251001'
           prompt: |
-            CLAUDE.md の "Issue Triage Prompt" セクションに従って Issue を分類してください。
+            CLAUDE.md の "Issue Triage Prompt" セクションに従って、この Issue を分類してください。
 
             【Issue情報】
             Repository: ${{ github.repository }}
             Issue Number: ${{ github.event.issue.number }}
             Title: ${{ env.ISSUE_TITLE }}
             Body: ${{ env.ISSUE_BODY }}
+
+            適切なラベル（bug, feature, enhancement, documentation, question）を GitHub Issue に付与してください。
